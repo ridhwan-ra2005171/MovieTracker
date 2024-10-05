@@ -104,6 +104,7 @@ export default function App() {
               selectedId={selectedId}
               onCloseMovie={handleCloseMovie}
               onAddWatched={handleAddWatched}
+              watched={watched} //so user cant add the same movie again
             />
           ) : (
             <>
@@ -117,10 +118,17 @@ export default function App() {
   );
 }
 
-function MovieDetails({ selectedId, onCloseMovie, onAddWatched }) {
+function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState(0);
+
+  //to check if alr rated
+  const isWatched = watched.some((movie) => movie.imdbID === selectedId);
+  const watchedUserRating = watched.find(
+    (movie) => movie.imdbID === selectedId
+  )?.userRating;
+  //---------------------------------
 
   const {
     Title: title,
@@ -154,7 +162,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched }) {
     [selectedId]
   ); //see we need to pass selectedId as a dependency
 
-  function handleAdd(){
+  function handleAdd() {
     const newWatchedMovie = {
       imdbID: selectedId,
       title,
@@ -162,7 +170,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched }) {
       poster,
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ").at(0)),
-      userRating,//from the state and starRating
+      userRating, //from the state and starRating
     };
     onAddWatched(newWatchedMovie);
     onCloseMovie();
@@ -193,14 +201,22 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched }) {
           </header>
           <section>
             <div className="rating">
-              <StarRating 
-              onSetRating={setUserRating} 
-              maxRating={10} 
-              size={25} 
-              />
-              {userRating>0 && 
-              (<button className="btn-add" onClick={handleAdd}>Add to Watched</button>)
-              }
+              {!isWatched ? (
+                <>
+                  <StarRating
+                    onSetRating={setUserRating}
+                    maxRating={10}
+                    size={25}
+                  />
+                  {userRating > 0 && (
+                    <button className="btn-add" onClick={handleAdd}>
+                      Add to Watched
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>You have rated this movie as {watchedUserRating} <span>🌟</span></p>
+              )}
             </div>
             <p>
               <em>{plot}</em>
