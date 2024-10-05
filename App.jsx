@@ -80,6 +80,10 @@ export default function App() {
     // console.log(watched);
   }
 
+  function handleDeleteWatched(id){
+    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
+  }
+
   //will be prop drilling all the way. app->main->listbox->movieList
   //app-> navbar
   //we have fixed it using component composition
@@ -109,7 +113,7 @@ export default function App() {
           ) : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedMoviesList watched={watched} />
+              <WatchedMoviesList watched={watched} onDeleteWatched={handleDeleteWatched} />
             </>
           )}
         </ListBox>
