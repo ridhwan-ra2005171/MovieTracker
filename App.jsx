@@ -166,6 +166,18 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     [selectedId]
   ); //see we need to pass selectedId as a dependency
 
+  //to handle the tab name based on selected movie
+  useEffect(function () {
+    if(!title) return;
+    //at the beginning title is undefined.
+    document.title = `Movie | ${title}`;
+
+    //needs a cleanup function to remove the title
+    return function () {
+      document.title = "usePopcorn";//original form
+    }
+  },[title]);
+
   function handleAdd() {
     const newWatchedMovie = {
       imdbID: selectedId,
