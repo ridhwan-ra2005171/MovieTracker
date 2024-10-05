@@ -28,8 +28,7 @@ export default function App() {
   useEffect(
     function () {
       //we want to add cleaning up data fetching
-      const controller = new AbortController();//browser API
-
+      const controller = new AbortController(); //browser API
 
       async function fetchMovies() {
         try {
@@ -37,7 +36,7 @@ export default function App() {
           setIsError(""); //resetting in every fetch
           const res = await fetch(
             `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-            {signal: controller.signal}
+            { signal: controller.signal }
           );
 
           //if cant fetch data
@@ -56,7 +55,7 @@ export default function App() {
           console.log(data.Search);
         } catch (error) {
           console.log(error);
-          if(error.name !== "AbortError"){
+          if (error.name !== "AbortError") {
             setIsError(error.message);
           }
         } finally {
@@ -71,12 +70,11 @@ export default function App() {
         return;
       }
       fetchMovies();
-      
 
       //cleanup function, to cancel current request if there is new one coming. (like searching in each keypress)
-      return function(){
+      return function () {
         controller.abort();
-      }
+      };
     },
     [query]
   );
@@ -94,7 +92,7 @@ export default function App() {
     // console.log(watched);
   }
 
-  function handleDeleteWatched(id){
+  function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
 
@@ -127,7 +125,10 @@ export default function App() {
           ) : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedMoviesList watched={watched} onDeleteWatched={handleDeleteWatched} />
+              <WatchedMoviesList
+                watched={watched}
+                onDeleteWatched={handleDeleteWatched}
+              />
             </>
           )}
         </ListBox>
@@ -181,16 +182,19 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   ); //see we need to pass selectedId as a dependency
 
   //to handle the tab name based on selected movie
-  useEffect(function () {
-    if(!title) return;
-    //at the beginning title is undefined.
-    document.title = `Movie | ${title}`; //from const { Title: title, ... } = movie;
+  useEffect(
+    function () {
+      if (!title) return;
+      //at the beginning title is undefined.
+      document.title = `Movie | ${title}`; //from const { Title: title, ... } = movie;
 
-    //needs a cleanup function to remove the title
-    return function () {
-      document.title = "usePopcorn";//original form
-    }
-  },[title]);
+      //needs a cleanup function to remove the title
+      return function () {
+        document.title = "usePopcorn"; //original form
+      };
+    },
+    [title]
+  );
 
   function handleAdd() {
     const newWatchedMovie = {
@@ -205,6 +209,25 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     onAddWatched(newWatchedMovie);
     onCloseMovie();
   }
+
+  //to handle keypress (ESC key), we put it here so it only works when movie details is open
+  useEffect(
+    function () {
+      function callback(e) {
+        if (e.code === "Escape") {
+          onCloseMovie();
+        }
+      }
+
+      document.addEventListener("keydown", callback);
+
+      //cleanup function, to remove the event listener, so there isnt too many in the DOM
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onCloseMovie]
+  );
 
   return (
     <div className="details">
@@ -245,7 +268,10 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
                   )}
                 </>
               ) : (
-                <p>You have rated this movie as {watchedUserRating} <span>🌟</span></p>
+                <p>
+                  You have rated this movie as {watchedUserRating}{" "}
+                  <span>🌟</span>
+                </p>
               )}
             </div>
             <p>
