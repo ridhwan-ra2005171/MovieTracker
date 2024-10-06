@@ -228,23 +228,25 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   }
 
   //to handle keypress (ESC key), we put it here so it only works when movie details is open
-  useEffect(
-    function () {
-      function callback(e) {
-        if (e.code === "Escape") {
-          onCloseMovie();
-        }
-      }
+  //to handle keypress (ESC key), we put it here so it only works when movie details is open
+  useKey("Escape", onCloseMovie); //from custom Hook we created
+  // useEffect(
+  //   function () {
+  //     function callback(e) {
+  //       if (e.code === "Escape") {
+  //         onCloseMovie();
+  //       }
+  //     }
 
-      document.addEventListener("keydown", callback);
+  //     document.addEventListener("keydown", callback);
 
-      //cleanup function, to remove the event listener, so there isnt too many in the DOM
-      return function () {
-        document.removeEventListener("keydown", callback);
-      };
-    },
-    [onCloseMovie]
-  );
+  //     //cleanup function, to remove the event listener, so there isnt too many in the DOM
+  //     return function () {
+  //       document.removeEventListener("keydown", callback);
+  //     };
+  //   },
+  //   [onCloseMovie]
+  // );
 
   return (
     <div className="details">
