@@ -13,13 +13,19 @@ const KEY = "dcad1bc9";
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
-  const [isLoading, setIsLoading] = useState(false); //for conditional render
+   const [isLoading, setIsLoading] = useState(false); //for conditional render
   const [isError, setIsError] = useState(""); //for conditional render
   // const tempQuery = "Interstellar";
 
   //to select movie (onIMDB id)
   const [selectedId, setSelectedId] = useState(null);
+
+  //we can get the local storage at the start instead of '[]', lazy evaluation
+  const [watched, setWatched] = useState(function(){
+    const jsonWatched = localStorage.getItem("watched");
+    const watched = JSON.parse(jsonWatched);
+    return watched || [];
+  });
 
   // fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`)
   // .then(response => response.json())
@@ -79,6 +85,14 @@ export default function App() {
     [query]
   );
 
+  //below is to store 'watched' in local storage
+  useEffect(
+    function(){
+    localStorage.setItem("watched", JSON.stringify(watched));
+  }, 
+  [watched]
+);
+
   function handleSelectMovie(id) {
     //if id equal to current one, set it to null. so when user presses same movie again the details closes
     setSelectedId((selectedId) => (selectedId === id ? null : id));
@@ -90,7 +104,10 @@ export default function App() {
   function handleAddWatched(movie) {
     setWatched((watched) => [...watched, movie]);
     // console.log(watched);
+    //we want to store it in local storage (can only store string value pair)
+    // localStorage.setItem("watched", JSON.stringify([...watched, movie]));
   }
+
 
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
